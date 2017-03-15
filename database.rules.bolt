@@ -1,0 +1,59 @@
+isCurrentUser(uid) { auth != null && auth.uid == uid }
+loggedIn() { auth != null }
+
+type User {
+  displayName: String;
+  photoURL: String;
+  phone: String | Null;
+  address: String | Null
+}
+
+path /users/{uid} is User {
+  read() { true }
+  write() { isCurrentUser(uid) }
+}
+
+openForBids(jobId) { (root.jobs[jobId] != null) && (root.jobs[jobId].locked != true) }
+owns(jobId) { loggedIn() && root.owner_to_jobs[auth.uid][jobId] != null }
+
+type Job {
+  chosen: String | Null;
+  locked: String | Null;
+  type: String;
+  desc: String;
+}
+
+path /jobs {
+  read() { true }
+}
+
+path /jobs/{jobId} is Job {
+  create() { loggedIn() }
+  update() { owns(jobId) }
+  delete() { owns(jobId) }
+}
+
+type Bid {
+  payed: Boolean | Null;
+  price: Number;
+}
+
+path /bids/{jobId} {
+  read() { owns(jobId) }
+}
+
+path /bids/{jobId}/{uid} is Bid {
+  read() { isCurrentUser(uid)}
+  update() { openForBids(jobId) }
+  create() { openForBids(jobId) }
+}
+
+path /owner_to_jobs/{uid} {
+  read() { isCurrentUser(uid) }
+}
+
+won(jobId) { loggedIn() && root.bids[jobId][auth.uid].payed == true }
+
+path /job_to_owner/{jobId} {
+  read() { won(jobId) }
+}
