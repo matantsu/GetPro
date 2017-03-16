@@ -1,15 +1,25 @@
 import { AppModule } from './app.module';
 import { NgRedux } from '@angular-redux/store';
-import { IAppState, Job, Bid, User } from './model';
+import { StoreState, } from './store';
+import { User, Job, Bid } from './state';
 import { AngularFire } from 'angularfire2';
 import { Observable } from 'rxjs';
 import { trace, a, id } from './util';
 
-export const user = (af: AngularFire): Observable<firebase.User> =>
-    af.auth.map(auth => auth ? auth.auth : null);
+const log = str => x => {
+    console.log(str);
+    return x;
+};
+
+export const user = (af: AngularFire): Observable<User> =>
+    af.auth.map(auth => auth ? auth.uid : null)
+        .flatMap(uid => uid ? af.database.object(`users/${uid}`) : Observable.of(null));
 export const bid = (af: AngularFire) => (jobId: string): Observable<Bid> =>
-    user(af).flatMap(u => u ? af.database.object(`bids/${jobId}/${u.uid}`, { preserveSnapshot: true })
-        .map(s => s.val() ? a(s.val(), {$key: s.key}) : s.val()) : null);
+    user(af).flatMap(u => u ?
+            af.database.object(`bids/${jobId}/${u.$key}`, { preserveSnapshot: true })
+                .map(s => s.val() ? a(s.val(), {$key: s.key}) : s.val()) :
+            Observable.of(null)
+        );
 export const owner = (af: AngularFire) => (jobId: string): Observable<User> =>
     af.database.object(`job_to_owner/${jobId}`, { preserveSnapshot: true })
         .map(x => x.val())
@@ -26,5 +36,4 @@ export const jobs = (af: AngularFire): Observable<Job[]> =>
         .flatMap(l => Observable.merge(...l))
         .scan((acc: Job[], x: {val: Job, index: number}) => {acc[x.index] = x.val; return acc; }, [])
         .map((l: Job[]) => l.filter(id))
-        .map(trace)
     ;

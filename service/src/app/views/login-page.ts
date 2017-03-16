@@ -1,17 +1,17 @@
-import { Job, IAppState } from './../model';
+import { Job, STATE, State } from './../state';
 import { Observable } from 'rxjs';
 import { id, trace } from './../util';
 import { jobs, user } from './../selectors';
 import { NgRedux } from '@angular-redux/store';
 import { AngularFire } from 'angularfire2';
 import { Actions } from './../actions';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'login-page', // <my-app></my-app>
   template: `
-    <div class="ui vertical orange inverted center aligned segment" style="height:100%">
+    <div class="ui vertical orange inverted center aligned segment" [ngClass]="{loading: loading}" style="height:100%">
         <div class="ui container">
             <br>
             <br>
@@ -29,9 +29,10 @@ import { Router } from '@angular/router';
   styleUrls: [],
 })
 export class LoginPageComponent {
-    constructor(private af: AngularFire, private router: Router) {}
-
+    loading = false;
+    constructor(@Inject(STATE) public state$: Observable<State>, public actions: Actions) {}
     login() {
-        this.af.auth.login();
+        this.loading = true;
+        this.actions.login();
     }
 }

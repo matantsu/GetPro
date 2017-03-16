@@ -1,3 +1,5 @@
+import { JobView } from './views/job';
+import { STATE, stateObservableFactory } from './state';
 import { LoginPageComponent } from './views/login-page';
 import { HomePageComponent } from './views/home-page';
 import { routes } from './routes';
@@ -11,10 +13,9 @@ import {persistStore, autoRehydrate} from 'redux-persist';
 import {createStore, compose, applyMiddleware} from 'redux';
 import { AppComponent } from './views/app.component';
 import { NgReduxModule, NgRedux, DevToolsExtension  } from '@angular-redux/store';
-import { rootReducer } from './reducers';
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 import { Actions } from './actions';
-import { initialState, IAppState } from './model';
+import { initialState, StoreState, rootReducer } from './store';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyCgw4KZ6T9EfFlsp_Nfn84AuS1YzhWj3z0',
@@ -47,10 +48,16 @@ declare var window: Window;
   declarations: [
     AppComponent,
     HomePageComponent,
-    LoginPageComponent
+    LoginPageComponent,
+    JobView
   ],
   providers: [
-    Actions
+    Actions,
+    {
+      provide: STATE,
+      useFactory: stateObservableFactory,
+      deps: [AngularFire, NgRedux]
+    }
   ],
   bootstrap: [AppComponent]
 })
@@ -58,7 +65,7 @@ export class AppModule {
   public static angularFire: AngularFire;
   constructor(private appRef: ApplicationRef,
               private af: AngularFire,
-              private ngRedux: NgRedux<IAppState>,
+              private ngRedux: NgRedux<StoreState>,
               private devTools: DevToolsExtension) {
     AppModule.angularFire = af;
     let enhancers = [];

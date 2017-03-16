@@ -1,45 +1,39 @@
 import { AngularFire } from 'angularfire2';
 import { Injectable } from '@angular/core';
-import { IAppState } from './model';
+import { StoreState } from './store';
 import { NgRedux } from '@angular-redux/store';
 import { Action } from 'redux';
 import { a, trace } from './util';
 import { Subscription } from 'rxjs';
 
-interface JobPostedAction extends Action {
-    type: 'jobPosted';
-    key: string;
-}
-
-function jobPosted(key: string): JobPostedAction {
-    return {
-        type: 'jobPosted',
-        key: key
-    };
-}
-
-export type AppAction = JobPostedAction;
-
 @Injectable()
 export class Actions {
-    constructor(private ngRedux: NgRedux<IAppState>, private angularFire: AngularFire) {
+    constructor(private ngRedux: NgRedux<StoreState>, private af: AngularFire) {
+    }
+
+    login() {
+        return this.af.auth.login();
+    }
+
+    logout() {
+        return this.af.auth.logout();
     }
 
     bid(job, bid) {
         trace(bid);
-        this.angularFire.auth
+        return this.af.auth
             .first()
             .subscribe(a =>
-                this.angularFire.database
+                this.af.database
                     .object(`bids/${job.$key}/${a.uid}`)
                     .set({price: +bid}));
     }
 
     pay(job) {
-        this.angularFire.auth
+        return this.af.auth
             .first()
             .subscribe(a =>
-                this.angularFire.database
+                this.af.database
                     .object(`bids/${job.$key}/${a.uid}/payed`)
                     .set(true));
     }

@@ -1,20 +1,21 @@
-import { Job, IAppState, Bid } from './../model';
+import { StoreState } from './../store';
+import { Job, Bid, State, STATE } from './../state';
 import { Observable } from 'rxjs';
 import { id, trace } from './../util';
 import { jobs, user } from './../selectors';
 import { NgRedux } from '@angular-redux/store';
 import { AngularFire } from 'angularfire2';
 import { Actions } from './../actions';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'home-page', // <my-app></my-app>
   template: `
-    <div class="ui vertical segment" style="height:100%">
+    <div class="ui vertical segment" [ngClass]="{loading: !(jobs$ | async)}" style="height:100%">
         <div class="ui container">
-            <div class="ui cards">
-                 <div class="ui card" *ngFor="let job of (jobs$ | async)">
+            <!--<div class="ui cards">
+                <div class="ui card" *ngFor="let job of (jobs$ | async)">
                   <div class="content">
                     <div class="header">{{job.desc}}</div>
                   </div>
@@ -48,8 +49,13 @@ import { Router } from '@angular/router';
                         </div>
                     </div>
                   </div>
-                </div>   
-            </div>
+                </div>
+                
+            </div>-->
+            <job *ngFor="let job of (jobs$ | async)"
+                [job]="job" 
+                (bid)="actions.bid(job, $event)"
+                (pay)="actions.pay(job)" ></job>
         </div>
     </div>
   `,
@@ -57,15 +63,7 @@ import { Router } from '@angular/router';
 })
 export class HomePageComponent {
     jobs$: Observable<Job[]>;
-    constructor(private af: AngularFire, private ngRedux: NgRedux<IAppState>, private actions: Actions) {
-        this.jobs$ = jobs(af);
-    }
-
-    bid(job: Job, bid: number) {
-        this.actions.bid(job, bid);
-    }
-
-    pay(job: Job) {
-        this.actions.pay(job);
+    constructor(@Inject(STATE) state$: Observable<State>, public actions: Actions) {
+        this.jobs$ = state$.map(s => s.jobs);
     }
 }

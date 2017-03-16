@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 // shorthand for Object.assign that is also typed.
 export function a<T>(a: T, b: any): T {
     return Object.assign({}, a, b);
@@ -10,3 +11,4 @@ export function trace(other: any) {
 }
 
 export const id = x => x;
+
