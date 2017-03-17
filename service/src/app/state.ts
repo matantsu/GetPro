@@ -4,6 +4,7 @@ import { AngularFire } from 'angularfire2';
 import { user, jobs } from './selectors';
 import { Observable } from 'rxjs';
 import { OpaqueToken } from '@angular/core';
+import { trace } from './util';
 
 export enum JobStatus {
     OPEN, // you can bid on it
@@ -25,7 +26,6 @@ export interface User {
     displayName: string;
     photoURL: string;
     phone: string;
-    address: string;
 }
 
 export interface Job {
@@ -57,6 +57,10 @@ export const jobStatus = (job: Job) =>
 ;
 
 export const stateObservableFactory: (af: AngularFire, store: NgRedux<StoreState>) => Observable<State> = (af, store) =>
-    Observable.combineLatest(user(af), jobs(af), (u, j): State => { return {user: u, jobs: j}; });
+    Observable.combineLatest(
+        user(af).startWith(null),
+        jobs(af).startWith(null),
+        (u, j): State => ({user: u, jobs: j}))
+    .map(trace);
 ;
 export let STATE = new OpaqueToken('app.state$');

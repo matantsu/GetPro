@@ -8,6 +8,7 @@ export interface Job {
 
 export interface Bid {
     $key?: string;
+    owner: User;
     price: number;
 }
 
@@ -16,11 +17,10 @@ export interface User {
     displayName: string;
     photoURL: string;
     phone: string;
-    address: string;
 }
 
-export interface IAppState {
+export interface StoreState {
 };
 
-export const initialState: IAppState = {
+export const initialState: StoreState = {
 };

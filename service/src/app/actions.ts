@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { StoreState } from './store';
 import { NgRedux } from '@angular-redux/store';
 import { Action } from 'redux';
-import { a, trace } from './util';
+import { assign, trace } from './util';
 import { Subscription } from 'rxjs';
 
 @Injectable()

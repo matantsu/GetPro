@@ -12,7 +12,10 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'job', // <my-app></my-app>
   template: `
-    <div class="ui huge segments" [ngSwitch]="jobStatus(job)">
+    <div class="ui loading huge segment" *ngIf="!job">
+      loading job ...
+    </div>
+    <div class="ui huge segments" *ngIf="job" [ngSwitch]="jobStatus(job)">
       <div class="ui segment">
         <p>
           {{job.desc}}
@@ -45,7 +48,6 @@ import { Router } from '@angular/router';
               </div>
             </div>
             <div *ngIf="!job.chosen">
-              <br>
               <h3 class="ui header">
                 <div class="ui active inline loader"></div>
                 <div class="content">
@@ -72,12 +74,18 @@ import { Router } from '@angular/router';
                 Congratz! You won the job
               </div>
             </h3>
-            <img class="ui avatar image" [src]="job.owner.photoURL">
-            <span>{{job.owner.displayName}}</span>
-            <a [href]="'tel:'+job.owner.phone" class="circular ui icon green right floated large button">
-              <i class="icon call"></i>
-              Call ({{job.owner.phone}})
-            </a>
+            <div *ngIf="!job.owner">
+              <div class="ui active inline loader"></div>
+              loading customer's details...
+            </div>
+            <div *ngIf="job.owner">
+              <img class="ui avatar image" [src]="job.owner.photoURL">
+              <span>{{job.owner.displayName}}</span>
+              <a [href]="'tel:'+job.owner.phone" class="circular ui icon green right floated large button">
+                <i class="icon call"></i>
+                Call ({{job.owner.phone}})
+              </a>
+            </div>
           </div>
           <div *ngSwitchCase="JobStatus.LOCKED">
             <h3 class="ui grey header">

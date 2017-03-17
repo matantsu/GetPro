@@ -1,3 +1,5 @@
+import { BidView } from './views/bid';
+import { STATE, stateObservableFactory } from './state';
 import { EditUserComponent } from './views/edit-user';
 import { JobPageComponent } from './views/job-page';
 import { routes } from './routes';
@@ -5,8 +7,9 @@ import { RouterModule } from '@angular/router';
 import { HomePageComponent } from './views/home-page';
 import { LoginComponent } from './views/login';
 import { PostJobComponent } from './views/post-job';
+import { JobView } from './views/job';
 import { Actions } from './actions';
-import { initialState, IAppState } from './model';
+import { initialState, StoreState } from './model';
 import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
@@ -55,10 +58,17 @@ declare var window: Window;
     LoginComponent,
     HomePageComponent,
     JobPageComponent,
-    EditUserComponent
+    EditUserComponent,
+    JobView,
+    BidView
   ],
   providers: [
-    Actions
+    Actions,
+    {
+      provide: STATE,
+      useFactory: stateObservableFactory,
+      deps: [AngularFire, NgRedux]
+    }
   ],
   bootstrap: [AppComponent]
 })
@@ -66,7 +76,7 @@ export class AppModule {
   public static angularFire: AngularFire;
   constructor(private appRef: ApplicationRef,
               private af: AngularFire,
-              private ngRedux: NgRedux<IAppState>,
+              private ngRedux: NgRedux<StoreState>,
               private devTools: DevToolsExtension) {
     AppModule.angularFire = af;
     let enhancers = [];

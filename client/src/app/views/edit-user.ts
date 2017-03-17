@@ -5,31 +5,44 @@ import { Router } from '@angular/router';
 import { Actions } from './../actions';
 import { AngularFire } from 'angularfire2';
 import { NgRedux } from '@angular-redux/store';
-import { Job, IAppState, User } from './../model';
+import { Job, StoreState, User } from './../model';
 import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'edit-user',
   template: `
     <div style="height:100%" >
-      <div class="ui vertical segment">
+      <div class="ui vertical huge segment">
         <div class="ui container">
-          <h1 class="ui header">
-              Edit user
-          </h1>
-          <div class="ui input">
-            <input #phoneInput [ngModel]="(user$ | async)?.phone" type="text" placeholder="phone">
+          <h2 class="ui dividing disabled header">
+              My profile
+          </h2>
+          <br>
+          <div class="ui huge form">
+            <img style="margin: auto" class="ui circular small image" [src]="(user$ | async).photoURL">
+            <br>
+            <div class="field">
+              <input #nameInput [ngModel]="(user$ | async).displayName" type="text" placeholder="Name">
+            </div>
+            <div class="field">
+              <input #phoneInput [ngModel]="(user$ | async).phone" type="tel" placeholder="Phone">
+            </div>
           </div>
-          <div class="ui input">
-              <input #addressInput [ngModel]="(user$ | async)?.address" type="text" placeholder="address">
-          </div>
-          
         </div>
       </div>
       <div class="ui vertical segment">
         <div class="ui container">
-          <div class="ui button" (click)="update(phoneInput.value,addressInput.value)">update</div>
-          <div class="ui button" [ngClass]="{disabled: !((user$ | async)?.phone && (user$ | async)?.address)}" (click)="post()">post</div>
+          <button class="ui big teal left labled icon circular button" 
+                  [ngClass]="{disabled: 
+                      !nameInput.value || 
+                      !phoneInput.value || 
+                      (nameInput.value == (user$ | async).displayName && 
+                      phoneInput.value == (user$ | async).phone)}" 
+                  type="submit"
+                  (click)="update(nameInput.value,phoneInput.value)">
+                <i class="i checkmark icon"></i>
+                Update
+          </button>
         </div>
       </div>
     </div>
@@ -39,12 +52,12 @@ import { Component, Output, EventEmitter } from '@angular/core';
 })
 export class EditUserComponent {
   user$: Observable<User>;
-  constructor(private ngRedux: NgRedux<IAppState>, private actions: Actions , private af: AngularFire, private router: Router) {
+  constructor(private ngRedux: NgRedux<StoreState>, private actions: Actions , private af: AngularFire, private router: Router) {
     this.user$ = user(af);
   }
 
-  update(phone, address) {
-    this.actions.editUser({phone: phone, address: address});
+  update(name, phone) {
+    this.actions.editUser({displayName: name, phone: phone});
   }
 
   post() {

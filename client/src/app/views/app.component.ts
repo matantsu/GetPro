@@ -1,11 +1,12 @@
+import { State, STATE } from './../state';
 import { user } from './../selectors';
 import { Observable } from 'rxjs';
 import { id } from './../util';
 import { NgRedux } from '@angular-redux/store';
 import { AngularFire } from 'angularfire2';
-import { IAppState, Bid, User } from './../model';
+import { StoreState, Bid, User } from './../model';
 import { Actions } from './../actions';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 import 'semantic-ui-css/semantic.min.js';
@@ -25,12 +26,12 @@ import 'semantic-ui-css/semantic.min.css';
                 client
               </div>
               <div class="right menu" *ngIf="user$ | async">
-                <div class="ui item">
+                <div class="ui item" routerLink="/edit">
                   <img class="ui avatar image" [src]="(user$ | async).photoURL">
                   &nbsp;
                   <span>{{(user$ | async).displayName}}</span>
                 </div>
-                <a class="ui icon item" (click)="logout()">
+                <a class="ui icon item" (click)="actions.logout()">
                   <i class="ui large icon sign out"></i>
                 </a>
               </div>
@@ -46,14 +47,10 @@ import 'semantic-ui-css/semantic.min.css';
 })
 export class AppComponent {
   user$: Observable<User>;
-  constructor(public actions: Actions, private af: AngularFire, private ngRedux: NgRedux<IAppState>, private router: Router) {
-      this.user$ = user(af);
+  constructor(@Inject(STATE) state$: Observable<State>, public actions: Actions, private router: Router) {
+      this.user$ = state$.map(s => s.user);
       this.user$.subscribe(u => u ?
         (this.router.isActive('sign-in', false) ? this.router.navigateByUrl('home') : null) :
         this.router.navigateByUrl('sign-in'));
-  }
-
-  logout() {
-    this.af.auth.logout();
   }
 }

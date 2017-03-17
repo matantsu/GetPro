@@ -1,7 +1,7 @@
-import { IAppState } from './model';
+import { StoreState } from './model';
 import { AppAction } from './actions';
-import { a } from './util';
+import { assign } from './util';
 
-export const rootReducer = (state: IAppState, action: AppAction) =>
+export const rootReducer = (state: StoreState, action: AppAction) =>
     state
 ;

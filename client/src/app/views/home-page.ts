@@ -1,11 +1,12 @@
+import { STATE, State } from './../state';
 import { Router } from '@angular/router';
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, Inject } from '@angular/core';
 import { user, jobs } from './../selectors';
 import { Observable } from 'rxjs';
 import { id } from './../util';
 import { NgRedux } from '@angular-redux/store';
 import { AngularFire } from 'angularfire2';
-import { IAppState, Bid, Job } from './../model';
+import { StoreState, Bid, Job } from './../model';
 import { Actions } from './../actions';
 
 @Component({
@@ -14,27 +15,28 @@ import { Actions } from './../actions';
     <div style="height:100%">
       <div class="ui vertical segment">
         <div class="ui container">
-            <div class="ui button" routerLink="/edit">
-                post a job
+            <div class="ui teal huge fluid circular left labeled icon button" routerLink="/post">
+                <i class="announcement icon"></i>
+                Post a job
             </div>
         </div>
       </div>
-      <div class="ui vertical segment">
+      <div class="ui vertical segment" [ngClass]="{loading: !(jobs$ | async)}">
         <div class="ui container">
-            <h1 class="ui header">
-                Select a previous job
+            <h2 class="ui dividing disabled header">
+                My jobs
+            </h2>
+            <job *ngFor="let job of ((jobs$ | async) || [])"
+                [job]="job"></job>
+            <h1 class="ui icon disabled center aligned header" *ngIf="(jobs$ | async).length == 0">
+              <i class="newspaper icon"></i>
+              <div class="content">
+                No jobs
+                <div class="sub header">
+                    post your first job to get started
+                </div>
+              </div>
             </h1>
-            <div class="ui cards" *ngFor="let job of (jobs$ | async)">
-                <a class="card" (click)="gotoJob(job.$key)">
-                    <div class="content">
-                        <div class="header">{{job.type}}</div>
-                        <div class="meta">{{job.bids.length}} bids</div>
-                        <div class="description">
-                            {{job.desc}}
-                        </div>
-                    </div>
-                </a>
-            </div>
         </div>
       </div>
     </div>
@@ -43,8 +45,8 @@ import { Actions } from './../actions';
 })
 export class HomePageComponent {
     jobs$: Observable<Job[]>;
-    constructor(public actions: Actions, private af: AngularFire, private ngRedux: NgRedux<IAppState>, private router: Router) {
-      this.jobs$ = jobs(af);
+    constructor(public actions: Actions, @Inject(STATE) state$: Observable<State>,  private router: Router) {
+      this.jobs$ = state$.map(s => s.jobs);
     }
 
     gotoJob(jobId) {

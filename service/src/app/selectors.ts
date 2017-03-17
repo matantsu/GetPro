@@ -4,36 +4,37 @@ import { StoreState, } from './store';
 import { User, Job, Bid } from './state';
 import { AngularFire } from 'angularfire2';
 import { Observable } from 'rxjs';
-import { trace, a, id } from './util';
+import { trace, assign, id, list } from './util';
 
 const log = str => x => {
-    console.log(str);
+    console.log(str, x);
     return x;
 };
 
 export const user = (af: AngularFire): Observable<User> =>
-    af.auth.map(auth => auth ? auth.uid : null)
-        .flatMap(uid => uid ? af.database.object(`users/${uid}`) : Observable.of(null));
+    af.auth.skipWhile(x => x == null)
+        .flatMap(auth => auth ? af.database.object(`users/${auth.uid}`) : Observable.of(null));
 export const bid = (af: AngularFire) => (jobId: string): Observable<Bid> =>
-    user(af).flatMap(u => u ?
-            af.database.object(`bids/${jobId}/${u.$key}`, { preserveSnapshot: true })
-                .map(s => s.val() ? a(s.val(), {$key: s.key}) : s.val()) :
-            Observable.of(null)
-        );
+    user(af)
+        .filter(id)
+        .flatMap(u => af.database.object(`bids/${jobId}/${u.$key}`, { preserveSnapshot: true }))
+        .skipWhile(s => s.val() == null)
+        .map(s => assign(s.val(), {$key: s.key}));
 export const owner = (af: AngularFire) => (jobId: string): Observable<User> =>
-    af.database.object(`job_to_owner/${jobId}`, { preserveSnapshot: true })
+    bid(af)(jobId)
+        .skipWhile(b => !b.payed)
+        .flatMap(b => af.database.object(`job_to_owner/${jobId}`, { preserveSnapshot: true }))
         .map(x => x.val())
         .flatMap(userId => af.database.object(`users/${userId}`));
+
+const fillJob = (af: AngularFire) => (j: Job): Observable<Job> =>
+    Observable.combineLatest(
+                bid(af)(j.$key).startWith(null),
+                owner(af)(j.$key).startWith(null),
+                (b, o) => assign(j, {bid: b, owner: o, $key: j.$key})
+            );
+
 export const jobs = (af: AngularFire): Observable<Job[]> =>
-    af.database.list(`jobs`)
-        .map(l => l.map((j, i) => bid(af)(j.$key)
-            .flatMap(b =>
-                        b && b.payed ?
-                            owner(af)(j.$key).map(o => { return {index: i, val: a(j, {owner: o, bid: b, $key: j.$key})}; }) :
-                            Observable.of({index: i, val: a(j, {bid: b, $key: j.$key})})
-                    )
-        ))
-        .flatMap(l => Observable.merge(...l))
-        .scan((acc: Job[], x: {val: Job, index: number}) => {acc[x.index] = x.val; return acc; }, [])
-        .map((l: Job[]) => l.filter(id))
-    ;
+    af.database.list('jobs')
+        .map(l => l.map(fillJob(af)))
+        .flatMap(os => Observable.combineLatest(...os.map(o => o.startWith(null)), list));

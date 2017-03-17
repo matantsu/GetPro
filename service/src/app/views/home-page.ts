@@ -14,44 +14,9 @@ import { Router } from '@angular/router';
   template: `
     <div class="ui vertical segment" [ngClass]="{loading: !(jobs$ | async)}" style="height:100%">
         <div class="ui container">
-            <!--<div class="ui cards">
-                <div class="ui card" *ngFor="let job of (jobs$ | async)">
-                  <div class="content">
-                    <div class="header">{{job.desc}}</div>
-                  </div>
-                  <div class="content">
-                    <h4 class="ui sub header">{{job.type}}</h4>
-                  </div>
-                  <div class="extra content" *ngIf="!job.bid">
-                    <div class="ui input">
-                        <input #bidInput type="number" placeholder="bid">
-                    </div>
-                    <button class="ui button" (click)="bid(job,bidInput.value)">Bid</button>
-                  </div>
-                  <div class="extra content" *ngIf="job.bid">
-                    Your bid: {{job.bid.price}}
-                    <div *ngIf="job.chosen == job.bid.$key && !(job.bid.payed)">
-                        CHOSEN!
-                        <br>
-                        pay to get customer details:
-                        <div class="ui button" (click)="pay(job)">Pay</div>
-                    </div>
-                    <div *ngIf="job.chosen == job.bid.$key && (job.bid.payed)">
-                        You won the job! 
-                        <br>
-                        here is the client's details: 
-                        <div>
-                            name: {{job.owner.displayName}}
-                            <br>
-                            phone: {{job.owner.phone}}
-                            <br>
-                            address: {{job.owner.address}}
-                        </div>
-                    </div>
-                  </div>
-                </div>
-                
-            </div>-->
+            <h2 class="ui dividing disabled header">
+                Active jobs
+            </h2>
             <job *ngFor="let job of (jobs$ | async)"
                 [job]="job" 
                 (bid)="actions.bid(job, $event)"
