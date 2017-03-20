@@ -1,10 +1,14 @@
+import { ToastService } from './../toast';
+import { Observable } from 'rxjs';
+import { STATE, State } from './../state';
 import { user } from './../selectors';
 import { Router } from '@angular/router';
 import { Actions } from './../actions';
 import { AngularFire } from 'angularfire2';
 import { NgRedux } from '@angular-redux/store';
 import { Job, StoreState } from './../model';
-import { Component, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
+import { Toast } from './../toast';
+import { Component, Output, EventEmitter, ElementRef, ViewChild, Inject } from '@angular/core';
 
 declare var jQuery: any;
 
@@ -55,7 +59,19 @@ export class PostJobComponent {
   type: string;
   desc: string;
 
-  constructor(private ngRedux: NgRedux<StoreState>, private actions: Actions , private angularFire: AngularFire, private router: Router) {}
+  constructor(@Inject(STATE) private state$: Observable<State>, private actions: Actions , private router: Router,
+              private toaster: ToastService) {}
+
+  ngOnInit() {
+    this.state$.first()
+      .map(s => !s.user.phone)
+      .subscribe(u => {
+        if (u) {
+          this.toaster.show(new Toast('No phone number', 'Please enter a phone number to post a job', true, 10000));
+          this.router.navigateByUrl('/edit');
+        }
+      });
+  }
 
   post() {
     this.actions.postJob({type: this.type, desc: this.desc});

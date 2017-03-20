@@ -1,3 +1,5 @@
+import { ToastView } from './views/toast';
+import { ToastService } from './toast';
 import { BidView } from './views/bid';
 import { STATE, stateObservableFactory } from './state';
 import { EditUserComponent } from './views/edit-user';
@@ -60,7 +62,8 @@ declare var window: Window;
     JobPageComponent,
     EditUserComponent,
     JobView,
-    BidView
+    BidView,
+    ToastView
   ],
   providers: [
     Actions,
@@ -68,7 +71,8 @@ declare var window: Window;
       provide: STATE,
       useFactory: stateObservableFactory,
       deps: [AngularFire, NgRedux]
-    }
+    },
+    ToastService
   ],
   bootstrap: [AppComponent]
 })

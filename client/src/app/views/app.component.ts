@@ -1,3 +1,4 @@
+import { ToastService } from './../toast';
 import { State, STATE } from './../state';
 import { user } from './../selectors';
 import { Observable } from 'rxjs';
@@ -39,6 +40,7 @@ import 'semantic-ui-css/semantic.min.css';
           </div>
       </div>
       <div style="flex:1">
+        <toast [toast]="toast" *ngFor="let toast of toaster.toasts"></toast>
         <router-outlet></router-outlet>
       </div>
     </div>
@@ -47,7 +49,7 @@ import 'semantic-ui-css/semantic.min.css';
 })
 export class AppComponent {
   user$: Observable<User>;
-  constructor(@Inject(STATE) state$: Observable<State>, public actions: Actions, private router: Router) {
+  constructor(@Inject(STATE) state$: Observable<State>, public actions: Actions, private router: Router, public toaster: ToastService) {
       this.user$ = state$.map(s => s.user);
       this.user$.subscribe(u => u ?
         (this.router.isActive('sign-in', false) ? this.router.navigateByUrl('home') : null) :
