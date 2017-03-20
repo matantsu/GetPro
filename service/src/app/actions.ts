@@ -5,6 +5,7 @@ import { NgRedux } from '@angular-redux/store';
 import { Action } from 'redux';
 import { assign, trace } from './util';
 import { Subscription } from 'rxjs';
+import * as firebase from 'firebase';
 
 @Injectable()
 export class Actions {
@@ -26,7 +27,7 @@ export class Actions {
             .subscribe(a =>
                 this.af.database
                     .object(`bids/${job.$key}/${a.uid}`)
-                    .set({price: +bid}));
+                    .set({price: +bid, timestamp: firebase.database.ServerValue.TIMESTAMP}));
     }
 
     pay(job) {

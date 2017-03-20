@@ -16,6 +16,8 @@ export enum JobStatus {
 }
 
 export interface Bid {
+    timestamp?: number;
+
     $key: string;
     payed?: boolean;
     price: number;
@@ -29,6 +31,8 @@ export interface User {
 }
 
 export interface Job {
+    timestamp?: number;
+
     $key: string;
     owner?: User;
     bid?: Bid;

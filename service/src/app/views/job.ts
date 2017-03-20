@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
         <p>
           {{job.desc}}
         </p>
+        <i><small>{{job.timestamp | timeAgo}}</small></i>
         <a class="ui bottom right attached label">{{job.type}}</a>
       </div>
       <div class="ui segment" *ngIf="job.chosen && (jobStatus(job) == JobStatus.OPEN || jobStatus(job) == JobStatus.BIDDED)">
@@ -38,6 +39,7 @@ import { Router } from '@angular/router';
               [ngClass]="{disabled: !bidInput1.value}" 
               (click)="bid.emit(+bidInput1.value)"></i>
           </div>
+          
           <div *ngSwitchCase="JobStatus.BIDDED">
             <div class="ui mini statistic">
               <div class="value">
@@ -95,6 +97,7 @@ import { Router } from '@angular/router';
               </div>
             </h3>
           </div>
+          <i *ngIf="job.bid"><small>bidded: {{job.bid.timestamp | timeAgo}}</small></i>      
         </div>
       </div>
     </div>

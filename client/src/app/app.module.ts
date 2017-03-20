@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
 import { AngularFireModule, AngularFire, AuthProviders, AuthMethods } from 'angularfire2';
 import {persistStore, autoRehydrate} from 'redux-persist';
 import {createStore, compose, applyMiddleware} from 'redux';
-
+import { TimeAgoPipe } from 'time-ago-pipe';
 import { AppComponent } from './views/app.component';
 
 import { NgReduxModule, NgRedux, DevToolsExtension  } from '@angular-redux/store';
@@ -63,7 +63,8 @@ declare var window: Window;
     EditUserComponent,
     JobView,
     BidView,
-    ToastView
+    ToastView,
+    TimeAgoPipe
   ],
   providers: [
     Actions,

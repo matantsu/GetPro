@@ -17,6 +17,7 @@ openForBids(jobId) { (root.jobs[jobId] != null) && (root.jobs[jobId].locked != t
 owns(jobId) { loggedIn() && root.owner_to_jobs[auth.uid][jobId] != null }
 
 type Job {
+  timestamp: Number;
   chosen: String | Null;
   locked: String | Null;
   type: String;
@@ -28,12 +29,13 @@ path /jobs {
 }
 
 path /jobs/{jobId} is Job {
-  create() { loggedIn() }
+  create() { loggedIn() && this.timestamp == now}
   update() { owns(jobId) }
   delete() { owns(jobId) }
 }
 
 type Bid {
+  timestamp: Number;
   payed: Boolean | Null;
   price: Number;
 }
@@ -45,7 +47,7 @@ path /bids/{jobId} {
 path /bids/{jobId}/{uid} is Bid {
   read() { isCurrentUser(uid)}
   update() { openForBids(jobId) }
-  create() { openForBids(jobId) }
+  create() { openForBids(jobId) && this.timestamp == now }
 }
 
 path /owner_to_jobs/{uid} {

@@ -12,6 +12,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
             <p>
                 {{job.desc}}
             </p>
+            <i><small>{{job.timestamp | timeAgo}}</small></i>
             <a class="ui bottom right attached label">{{job.type}}</a>
         </div>
         <div class="ui large segment" [ngClass]="{loading: !job.bids}">

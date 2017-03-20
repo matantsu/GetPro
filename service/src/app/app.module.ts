@@ -16,6 +16,7 @@ import { NgReduxModule, NgRedux, DevToolsExtension  } from '@angular-redux/store
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 import { Actions } from './actions';
 import { initialState, StoreState, rootReducer } from './store';
+import { TimeAgoPipe } from 'time-ago-pipe';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyCgw4KZ6T9EfFlsp_Nfn84AuS1YzhWj3z0',
@@ -49,7 +50,8 @@ declare var window: Window;
     AppComponent,
     HomePageComponent,
     LoginPageComponent,
-    JobView
+    JobView,
+    TimeAgoPipe
   ],
   providers: [
     Actions,

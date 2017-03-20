@@ -1,4 +1,6 @@
 export interface Job {
+    timestamp?: number;
+
     $key?: string;
     type: string;
     desc: string;
@@ -7,6 +9,8 @@ export interface Job {
 }
 
 export interface Bid {
+    timestamp?: number;
+
     $key?: string;
     owner: User;
     price: number;

@@ -7,6 +7,7 @@ import { NgRedux } from '@angular-redux/store';
 import { Action } from 'redux';
 import { assign, trace, id } from './util';
 import { Subscription } from 'rxjs';
+import * as firebase from 'firebase';
 
 export type AppAction = null;
 
@@ -17,7 +18,7 @@ export class Actions {
 
     postJob(job: Job) {
         this.af.database.list('jobs/')
-            .push(job)
+            .push(assign(job, {timestamp: firebase.database.ServerValue.TIMESTAMP}))
             .then(x => this.router.navigateByUrl('job/' + x.key));
     }
 

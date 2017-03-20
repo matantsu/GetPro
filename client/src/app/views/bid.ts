@@ -16,6 +16,8 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
               <i><b>bidded</b></i>
             </span>
             <span style="float: right" class="ui tag big teal label">$ {{bid.price}}</span>
+            <br>
+            <i><small>{{job.timestamp | timeAgo}}</small></i>
         </div>
         <div *ngIf="job.chosen == bid.$key" class="ui huge segment">
             <h3 class="ui green header">
