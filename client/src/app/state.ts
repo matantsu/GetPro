@@ -9,13 +9,18 @@ import { trace } from './util';
 export interface State {
     user: User;
     jobs: Job[];
+    jobsByKey: {[s: string]: Job};
 }
 
 export const stateObservableFactory: (af: AngularFire, store: NgRedux<StoreState>) => Observable<State> = (af, store) => {
     let state$ = Observable.combineLatest(
         user(af).startWith(null),
         jobs$(af).startWith(null),
-        (u, j): State => ({user: u, jobs: j || null}))
+        (u, j): State => ({
+            user: u,
+            jobs: j || null,
+            jobsByKey: j ? j.reduce((acc, n) => {acc[n.$key] = n; return acc; }, {}) : {}
+        }))
     .map(trace);
     state$.subscribe();
     return state$;

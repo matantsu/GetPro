@@ -39,8 +39,12 @@ import 'semantic-ui-css/semantic.min.css';
             </div>
           </div>
       </div>
+      <div class="vertical segment">
+        <div class="ui container">
+          <toast [toast]="toast" *ngFor="let toast of toaster.toasts"></toast>
+        </div>
+      </div>
       <div style="flex:1">
-        <toast [toast]="toast" *ngFor="let toast of toaster.toasts"></toast>
         <router-outlet></router-outlet>
       </div>
     </div>

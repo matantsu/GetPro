@@ -19,9 +19,14 @@ declare var jQuery: any;
             {{toast.desc}}
         </p>
     </div>
-    <br>
   `,
-  styleUrls: [],
+  styles: [
+      `
+          :host {
+              margin: 1em
+          }
+      `
+  ],
 })
 export class ToastView {
     @Input() toast: Toast;

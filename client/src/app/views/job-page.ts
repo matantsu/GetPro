@@ -1,3 +1,4 @@
+import { ToastService } from './../toast';
 import { STATE, State } from './../state';
 import { Component, Input, EventEmitter, Output, Inject } from '@angular/core';
 import { user, job, bids } from './../selectors';
@@ -9,12 +10,13 @@ import { StoreState, Bid, Job } from './../model';
 import { Actions } from './../actions';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { trace } from './../util';
+import { Toast } from './../toast';
 
 @Component({
   selector: 'job-page',
   template: `
     <div style="height:100%">
-      <div class="ui vertical segment">
+      <div class="ui vertical segment" [ngClass]="{loading: !(job$ | async)}">
         <div class="ui container">
             <bid *ngFor="let bid of (job$ | async)?.bids"
                 [job]="(job$ | async)"
@@ -37,17 +39,22 @@ import { trace } from './../util';
   styleUrls: [],
 })
 export class JobPageComponent {
+  stop = false;
   job$: Observable<Job>;
   jobId$: Observable<string>;
-  constructor(private route: ActivatedRoute, private af: AngularFire,
-              @Inject(STATE) private state$: Observable<State>, private actions: Actions, private router: Router) {}
+  constructor(private route: ActivatedRoute,
+              @Inject(STATE) private state$: Observable<State>,
+              private actions: Actions,
+              private router: Router,
+              private toaster: ToastService) {}
 
   ngOnInit() {
     this.jobId$ = this.route.params
       .first()
       .map(params => params['jobId']);
 
-    this.job$ = this.jobId$.flatMap(job(this.af));
+    this.job$ = this.jobId$.flatMap(id => this.state$
+      .map(s => s.jobsByKey[id]));
   }
 
   choose(bid) {
