@@ -19,13 +19,15 @@ export const bid = (af: AngularFire) => (jobId: string): Observable<Bid> =>
         .filter(id)
         .flatMap(u => af.database.object(`bids/${jobId}/${u.$key}`, { preserveSnapshot: true }))
         .skipWhile(s => s.val() == null)
-        .map(s => assign(s.val(), {$key: s.key}));
+        .map(s => assign(s.val(), {$key: s.key}))
+        .onErrorResumeNext(null);
 export const owner = (af: AngularFire) => (jobId: string): Observable<User> =>
     bid(af)(jobId)
         .skipWhile(b => !b.payed)
         .flatMap(b => af.database.object(`job_to_owner/${jobId}`, { preserveSnapshot: true }))
         .map(x => x.val())
-        .flatMap(userId => af.database.object(`users/${userId}`));
+        .flatMap(userId => af.database.object(`users/${userId}`))
+        .onErrorResumeNext(null);
 
 const fillJob = (af: AngularFire) => (j: Job): Observable<Job> =>
     Observable.combineLatest(

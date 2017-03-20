@@ -97,6 +97,7 @@ import { Router } from '@angular/router';
               </div>
             </h3>
           </div>
+          <br>
           <i *ngIf="job.bid"><small>bidded: {{job.bid.timestamp | timeAgo}}</small></i>      
         </div>
       </div>
