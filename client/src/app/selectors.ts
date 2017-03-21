@@ -16,7 +16,8 @@ export const bids = (af: AngularFire) => (jobId: string) =>
     af.database.list(`bids/${jobId}/`)
         .map(bs => bs.map(fillBid(af)))
         .flatMap(os => Observable.combineLatest(...os.map(o => o.startWith(null)), list))
-        .startWith([]);
+        .startWith([])
+        .map(j => j.sort((a, b) => b.timestamp - a.timestamp));
 export const job = (af: AngularFire) => (jobId: string): Observable<Job> =>
     af.database.object(`jobs/${jobId}`)
         .flatMap(j => bids(af)(jobId)
@@ -44,4 +45,5 @@ export const jobs$ = (af: AngularFire): Observable<Job[]> =>
         .map(l => l.map(fillJob(af)))
         .flatMap(os => Observable.combineLatest(...os.map(o => o.startWith(null)), list))
         .map(l => l.filter(id))
-        .startWith([]);
+        .startWith([])
+        .map(j => j.sort((a, b) => b.timestamp - a.timestamp));

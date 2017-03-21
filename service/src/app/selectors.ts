@@ -39,4 +39,5 @@ const fillJob = (af: AngularFire) => (j: Job): Observable<Job> =>
 export const jobs = (af: AngularFire): Observable<Job[]> =>
     af.database.list('jobs')
         .map(l => l.map(fillJob(af)))
-        .flatMap(os => Observable.combineLatest(...os.map(o => o.startWith(null)), list));
+        .flatMap(os => Observable.combineLatest(...os.map(o => o.startWith(null)), list))
+        .map(j => j ? j.sort((a, b) => a && b ? b.timestamp - a.timestamp : 1) : j);
